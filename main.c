@@ -2,7 +2,7 @@
 main.c
 authors: Bikranta Singha, Harshitbhai Patel, Thinh Quach
 date created: 20th July, 2022
-date modified: 23rd July, 2022
+last modified: 23rd July, 2022
 main.c file for group 8's term project for PROG20799 class 91692
 house listings from mls being used to implement 3 different data structures:
 stack, queue, and binary tree
@@ -16,7 +16,7 @@ stack, queue, and binary tree
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
 struct Node {
-	int id;
+	int id; 
 	char address[50];
 	int price;
 	struct Node * nextPtr;
@@ -49,6 +49,12 @@ NodePtr dequeue(NodePtr * queue);
 void printQ(NodePtr queue);
 
 //tree definitions
+void insertIntoTree(TreeNodePtr * tree, int id, char * address, int price);
+void removeFromTree(TreeNodePtr * tree, int id);
+TreeNodePtr binarySearchById(TreeNodePtr tree, int id);
+void preOrder(TreeNodePtr tree);
+void postOrder(TreeNodePtr tree);
+void inOrder(TreeNodePtr tree);
 
 
 void main(int argc, char *argv[]) {
@@ -94,6 +100,39 @@ void main(int argc, char *argv[]) {
 	back = enqueue(&front, back, 3, "2 56 Cc circle, Brampton", 567);
 	printQ(front);
 	*/
+	
+	TreeNodePtr tree = (TreeNodePtr)malloc(sizeof(TreeNode));
+	strcpy(tree -> address, "1 34 Aa Avenue, Toronto");
+	tree -> id = 7;
+	tree -> price = 3;
+	tree -> leftPtr = NULL;
+	tree -> rightPtr = NULL;
+	
+	printf("\n inorder:");
+	inOrder(tree);
+	
+	insertIntoTree(&tree, 16, "2 22 Bb Boulevard, Kitchner", 444);
+	insertIntoTree(&tree, 32, "3 333 Bb Boulevard, Kitchner", 444);
+	insertIntoTree(&tree, 4, "2 555 Bb Boulevard, Kitchner", 444);
+	insertIntoTree(&tree, 5, "2 115 Bb Boulevard, Kitchner", 444);
+	insertIntoTree(&tree, 32, "2 66 Bb Boulevard, Kitchner", 444);
+	
+	printf("\nbinary search for id 777");
+	TreeNodePtr searchTree = binarySearchById(tree, 777);
+	printf("\n %d", searchTree);
+	printf("\nbinary search for id 4");
+	searchTree = binarySearchById(tree, 4);
+	printf("\nid: %d \naddress: %s \nprice: %d",searchTree->id, searchTree->address, searchTree->price);
+		
+	printf("\n inorder:");
+	inOrder(tree);
+	
+	printf("\n preorder:");
+	preOrder(tree);
+	
+	printf("\n postorder:");
+	postOrder(tree);
+	
 }
 
 
@@ -192,6 +231,62 @@ void printQ(NodePtr queue){
 	}
 }
 
-
-
 //tree operations
+void insertIntoTree(TreeNodePtr * tree, int id, char * address, int price){
+	if(*tree == NULL){
+		*tree = (TreeNodePtr)malloc(sizeof(TreeNode));
+		if(*tree != NULL){
+			(*tree)->id = id;
+			strcpy((*tree)->address, address);
+			(*tree)->price = price;
+			(*tree)->leftPtr = NULL;
+			(*tree)->rightPtr = NULL;
+		} else{
+			printf("\nTree node with id: %d address: %s price: %d not inserted. No memory available.", id, address, price);
+			
+		}
+	} else {
+		if(id < (*tree)->id){
+			insertIntoTree(&((*tree)->leftPtr), id, address, price);
+		} else if(id > (*tree)->id){
+			insertIntoTree(&((*tree)->rightPtr), id, address, price);
+		} else {
+			printf("\nListing with id %d not inserted. Duplicate id. Please try again with an unique id.", id);
+		}
+	}
+}
+
+TreeNodePtr binarySearchById(TreeNodePtr tree, int id){
+	if(tree == NULL){
+		return NULL;
+	} else if(tree->id == id){
+		return tree;
+	} else if(id < tree->id){
+		binarySearchById(tree->leftPtr, id);
+	} else{
+		binarySearchById(tree->rightPtr, id);
+	}
+}
+void preOrder(TreeNodePtr tree){
+	if(tree != NULL){
+		printf("\n\nid: %d \naddress: %s \nprice: %d", tree->id, tree->address, tree->price);
+		preOrder(tree->leftPtr);
+		preOrder(tree->rightPtr);
+	}
+}
+void postOrder(TreeNodePtr tree){
+	if(tree != NULL){
+		postOrder(tree->leftPtr);
+		postOrder(tree->rightPtr);
+		printf("\n\nid: %d \naddress: %s \nprice: %d", tree->id, tree->address, tree->price);
+	}
+}
+
+void inOrder(TreeNodePtr tree){
+	if(tree != NULL){
+		inOrder(tree->leftPtr);
+		printf("\n\nid: %d \naddress: %s \nprice: %d", tree->id, tree->address, tree->price);
+		inOrder(tree->rightPtr);
+	}
+}
+
