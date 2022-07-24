@@ -35,11 +35,20 @@ typedef Node * NodePtr;
 typedef struct TreeNode TreeNode;
 typedef TreeNode *TreeNodePtr;
 
-//NodePtr *nodePtr, char * address
+//stack definitions
 void push(NodePtr * stack, int id, char * address, int price);
 void pop(NodePtr * stack);
 void top(NodePtr stack);
 void printStack(NodePtr stack);
+
+//queue definitions
+void frontQ(NodePtr queue);
+void backQ(NodePtr queue, NodePtr back);
+NodePtr enqueue(NodePtr * queue, NodePtr back, int id, char * address, int price);
+NodePtr dequeue(NodePtr * queue);
+void printQ(NodePtr queue);
+
+//tree definitions
 
 
 void main(int argc, char *argv[]) {
@@ -49,7 +58,12 @@ void main(int argc, char *argv[]) {
 	root -> price = 3;
 	root -> nextPtr = NULL;
 	
-	/*testing stack operations
+	//only to be used by queue operations
+	NodePtr front = NULL;
+	NodePtr back = NULL;
+	
+	/*
+	//testing stack operations
 	top(root);
 	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
 	top(root);
@@ -60,6 +74,25 @@ void main(int argc, char *argv[]) {
 	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
 	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
 	printStack(root);
+	*/
+	/*
+	//testing queue operations
+	front = root;
+	back = root;
+	frontQ(front);
+	backQ(front, back);
+	back = enqueue(&front, back, 3, "3 56 Cc circle, Brampton", 567);
+	frontQ(front);
+	backQ(front, back);
+	printf("\ndq");
+	front = dequeue(&front);
+	printf("\ndq success");
+	frontQ(front);
+	backQ(front,back);
+	back = enqueue(&front, back, 3, "5 56 Cc circle, Brampton", 567);
+	back = enqueue(&front, back, 3, "4 56 Cc circle, Brampton", 567);
+	back = enqueue(&front, back, 3, "2 56 Cc circle, Brampton", 567);
+	printQ(front);
 	*/
 }
 
@@ -97,14 +130,68 @@ void top(NodePtr stack){
 void printStack(NodePtr stack){
 	if(stack == NULL){
 		printf("\nNo listings to print. The stack is empty.");
-	} else if(stack->nextPtr == NULL) {
-		printf("\n\nid: %d \naddress: %s \nprice: %d", stack->id, stack->address, stack->price);	
 	} else {
 		printf("\n\nid: %d \naddress: %s \nprice: %d", stack->id, stack->address, stack->price);
-		printStack(stack->nextPtr);
+		if(stack->nextPtr != NULL){
+			printStack(stack->nextPtr);
+		}
 	}
 }
+
 //queue operations
+void frontQ(NodePtr queue){
+	if(queue == NULL){
+		printf("\nNo listings found. The queue is empty.");
+	} else {
+		printf("\nFront house listing: \nid: %d \naddress: %s \nprice: %d", queue->id, queue->address, queue->price);
+	}
+}
+
+void backQ(NodePtr queue, NodePtr back){
+	if(queue == NULL){
+		printf("\nNo listings found. The queue is empty.");
+	} else{
+		printf("\nBack house listing: \nid: %d \naddress: %s \nprice: %d", back->id, back->address, back->price);
+	}
+}
+
+NodePtr enqueue(NodePtr * queue, NodePtr back, int id, char * address, int price){
+	//setting up the node
+	NodePtr root = (NodePtr)malloc(sizeof(Node));
+	root->id = id;
+	strcpy(root->address, address);
+	root->price = price;
+	root->nextPtr = NULL;
+	
+	//adding the node to the back of the queue
+	back->nextPtr = root;
+	return root;
+}
+
+NodePtr dequeue(NodePtr * queue){
+	if(*queue != NULL){
+		printf("\nListing dequeued: \nid: %d \naddress: %s \nprice: %d", (*queue)->id, (*queue)->address, (*queue)->price);
+		NodePtr tempPtr = *queue;
+		*queue = (*queue) -> nextPtr;
+		free(tempPtr);
+		return (*queue);
+	} else {
+		printf("\nNo listing popped. The stack is empty.");
+		return NULL;
+	}
+}
+
+void printQ(NodePtr queue){
+	if(queue == NULL){
+		printf("\nNo listings to print. The queue is empty.");
+	} else{
+		printf("\n\nid: %d \naddress: %s \nprice: %d", queue->id, queue->address, queue->price);
+		 if(queue->nextPtr != NULL){
+		 	printQ(queue->nextPtr);
+		 }	
+	}
+}
+
 
 
 //tree operations
