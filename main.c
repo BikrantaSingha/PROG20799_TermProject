@@ -58,15 +58,40 @@ void inOrder(TreeNodePtr tree);
 
 
 void main(int argc, char *argv[]) {
-	NodePtr root = (NodePtr)malloc(sizeof(Node));
-	strcpy(root -> address, "1 34 Aa drive, Toronto");
-	root -> id = 1;
-	root -> price = 3;
-	root -> nextPtr = NULL;
+	//node attributes
+	int id;
+	int price;
+	char address[50];
+	int i; //will be used for for loops
 	
 	//only to be used by queue operations
 	NodePtr front = NULL;
 	NodePtr back = NULL;
+	
+	//dummy addresses
+	char * dummyAddresses[] = {
+	"34 Aa Avenue, Toronto",
+	"56 Bb Boulevard, Brampton",
+	"701 Cc Circle Road, Mississauga",
+	"9903 Dd Drive, Kitchner",
+	"206 Ee Drive, Toronto",
+	"206 Ee Drive, Toronto"};
+	
+	//initializing root for queue and stack
+	NodePtr root = (NodePtr)malloc(sizeof(Node));
+	strcpy(root -> address, "1 34 Aa drive, Toronto");
+	root -> id = 0;
+	root -> price = 300000;
+	root -> nextPtr = NULL;
+	
+	//initializing tree 
+	TreeNodePtr tree = (TreeNodePtr)malloc(sizeof(TreeNode));
+	strcpy(tree -> address, "1 34 Aa Avenue, Toronto");
+	tree -> id = 0;
+	tree -> price = 300000;
+	tree -> leftPtr = NULL;
+	tree -> rightPtr = NULL;
+	
 	
 	/*
 	//testing stack operations
@@ -101,15 +126,9 @@ void main(int argc, char *argv[]) {
 	printQ(front);
 	*/
 	
-	TreeNodePtr tree = (TreeNodePtr)malloc(sizeof(TreeNode));
-	strcpy(tree -> address, "1 34 Aa Avenue, Toronto");
-	tree -> id = 7;
-	tree -> price = 3;
-	tree -> leftPtr = NULL;
-	tree -> rightPtr = NULL;
 	
-	printf("\n inorder:");
-	inOrder(tree);
+	/*
+	//testing tree operations
 	
 	insertIntoTree(&tree, 16, "2 22 Bb Boulevard, Kitchner", 444);
 	insertIntoTree(&tree, 32, "3 333 Bb Boulevard, Kitchner", 444);
@@ -132,18 +151,212 @@ void main(int argc, char *argv[]) {
 	
 	printf("\n postorder:");
 	postOrder(tree);
+	*/
+	//Main menu with submenus
+	int mainChoice;
+	do {
+		printf("\n----Main Menu----"); //Main Menu
+		printf("\n\n1) Stack Operations\n2) Queue Operations\n3) Tree Operations \n0) Exit");
+		printf("\nEnter number as your choice: ");
+		scanf("%d", &mainChoice);
+		switch(mainChoice) {
+			case 1:	//Stack Menu
+				printf("\n");
+				int stackChoice;
+				printf("\nConstructing dummy stack...");
+				root->nextPtr = NULL;
+				for(i=0; i<6;i++){
+					push(&root,i+1,dummyAddresses[i],800000);
+				}
+				do {
+					
+					printf("\n\n---Stack Operations---"); 
+					printf("\n\n1) Top\n2) Push\n3) Pop\n4) Print Stack\n0) Exit Stack Operations");
+					printf("\nEnter number as your choice: ");
+					scanf("%d", &stackChoice);
+					switch(stackChoice) {
+						case 1: //Top
+							top(root);
+							break;
+
+						case 2: //Push 
+							printf("\nEnter id: ");
+							scanf("%d", &id);
+							printf("\nEnter address: ");
+							scanf("%s", &address);
+							printf("\nEnter price: ");
+							scanf("%d", &price);
+							push(&root,id, address, price);
+							
+							break;
+
+						case 3: //Pop
+							pop(&root);
+							break;
+
+						case 4: //Print All Data in Stack
+							printf("\nPrinting Stack Listings...\n");
+							printStack(root);
+							break;
+
+						case 0: //Exit Stack Menu
+							printf("\n");
+							break;
+
+						default:
+							printf("\nInvalid input\n\n");
+					}
+				} while(stackChoice != 0);
+				break;
+
+			case 2: //Queue Menu
+				printf("\n");				
+				int queueChoice;
+				front = root;
+				back = root;
+				printf("\nConstructing dummy queue...");
+				root->nextPtr = NULL;
+				for(i=0; i<6;i++){
+					back = enqueue(&front, back,i+1,dummyAddresses[i],800000);
+				}
+				do {
+					printf("\n\n---Queue Operations---");
+					printf("\n\n1) Front of Queue\n2) Back of Queue\n3) Enqueue\n4) Dequeue\n5) Print Queue\n0) Exit Queue Operations");
+					printf("\nEnter number as your choice: ");
+					scanf("%d", &queueChoice);
+					switch(queueChoice) {
+						case 1: //Front of Queue
+							frontQ(front);
+							break;
+
+						case 2: //Back of Queue
+							backQ(front, back);
+							break;
+
+						case 3: //Enqueue
+							printf("\nEnter id: ");
+							scanf("%d", &id);
+							printf("\nEnter address: ");
+							scanf("%s", &address);
+							printf("\nEnter price: ");
+							scanf("%d", &price);
+							back = enqueue(&front, back, id, address, price);
+							break;
+
+						case 4: //Dequeue
+							front = dequeue(&front);
+							break;
+
+						case 5: //Print All Items in Queue
+							printf("\nPrinting Queue Listings...\n");
+							printQ(front);
+							break;
+
+						case 0: //Exit Queue Menu
+							printf("\n");
+							break;
+
+						default:
+							printf("\nInvalid input\n\n");
+					}
+				} while(queueChoice != 0);
+				break;
+
+			case 3: //Tree Menu
+				printf("\n");		
+				int treeChoice;
+				printf("\nConstructing dummy tree...");
+				tree->leftPtr = NULL;
+				tree->rightPtr = NULL;
+				for(i=0; i<6;i++){
+					insertIntoTree(&tree,i+1,dummyAddresses[i],800000);
+				}
+				do {
+					printf("\n\n---Tree operations---");
+					printf("\n\n1) Insert into Tree\n2) Remove by Id\n3) Binary Search with id\n4) Pre-order\n5) Post-order\n6) In-order\n0) Exit Tree Operations");
+					printf("\nEnter number as your choice: ");
+					scanf("%d", &treeChoice);
+					switch(treeChoice) {
+						case 1: //Insert into Tree
+							printf("\nEnter id: ");
+							scanf("%d", &id);
+							printf("\nEnter address: ");
+							scanf("%s", &address);
+							printf("\nEnter price: ");
+							scanf("%d", &price);
+							insertIntoTree(&tree,id,address,price);
+							break;
+
+						case 2: //Remove from Tree
+
+							break;
+
+						case 3: //Search Data in Tree
+							printf("\nEnter ID to search: ");
+							int searchID;
+							scanf("%d", &searchID);
+							TreeNodePtr searchTree = binarySearchById(tree, searchID);
+							if(searchTree == NULL){
+								printf("\n No listing found with id: %d", searchID);
+							} else {
+								printf("\n Listing found: ");
+								printf("\nid: %d \naddress: %s \nprice: %d",searchTree->id, searchTree->address, searchTree->price);
+							}
+							break;
+
+						case 4: //preOrder
+							printf("\nPrinting tree in Pre Order...");
+							preOrder(tree);
+							break;
+
+						case 5: //postOrder
+							printf("\nPrinting tree in Post Order...");
+							postOrder(tree);
+							break;
+
+						case 6: //inOrder
+							printf("\nPrinting tree in In Order...");
+							inOrder(tree);
+							break;
+
+						case 0: //Exit Tree Menu
+							printf("\n");
+							break;
+
+						default:
+							printf("\nInvalid input\n\n");
+					}
+				} while(treeChoice != 0);
+				break;
+				
+			case 4: //Exit Main Menu and Close Program
+				break;
+				
+			default:
+				printf("\nInvalid input\n\n");
+		}
+	} while(mainChoice != 0);
 	
 }
 
 
 //stack operations
 void push(NodePtr * stack, int id, char * address, int price){
-	NodePtr root = (NodePtr)malloc(sizeof(Node));
-	root -> id = id;
-	strcpy(root -> address, address);
-	root -> price = price;
-	root -> nextPtr = *stack;
-	(*stack) = root;
+	if(*stack == NULL){
+		*stack = (NodePtr)malloc(sizeof(Node));
+		(*stack) -> id = id;
+		strcpy((*stack) -> address, address);
+		(*stack) -> price = price;
+		(*stack) -> nextPtr = NULL;
+		
+	} else {
+		NodePtr root = (NodePtr)malloc(sizeof(Node));
+		root -> id = id;
+		strcpy(root -> address, address);
+		root -> price = price;
+		root -> nextPtr = *stack;
+		(*stack) = root;
+	}
 }
 
 void pop(NodePtr * stack){
@@ -195,16 +408,27 @@ void backQ(NodePtr queue, NodePtr back){
 }
 
 NodePtr enqueue(NodePtr * queue, NodePtr back, int id, char * address, int price){
-	//setting up the node
-	NodePtr root = (NodePtr)malloc(sizeof(Node));
-	root->id = id;
-	strcpy(root->address, address);
-	root->price = price;
-	root->nextPtr = NULL;
-	
-	//adding the node to the back of the queue
-	back->nextPtr = root;
-	return root;
+	if(*queue == NULL){
+		*queue = (NodePtr)malloc(sizeof(Node));
+		(*queue) -> id = id;
+		strcpy((*queue) -> address, address);
+		(*queue) -> price = price;
+		(*queue) -> nextPtr = NULL;
+		back = (*queue);
+		return back;
+		
+	}else {
+		//setting up the node
+		NodePtr root = (NodePtr)malloc(sizeof(Node));
+		root->id = id;
+		strcpy(root->address, address);
+		root->price = price;
+		root->nextPtr = NULL;
+		
+		//adding the node to the back of the queue
+		back->nextPtr = root;
+		return root;
+	}
 }
 
 NodePtr dequeue(NodePtr * queue){
@@ -251,7 +475,7 @@ void insertIntoTree(TreeNodePtr * tree, int id, char * address, int price){
 		} else if(id > (*tree)->id){
 			insertIntoTree(&((*tree)->rightPtr), id, address, price);
 		} else {
-			printf("\nListing with id %d not inserted. Duplicate id. Please try again with an unique id.", id);
+			printf("\nListing with id %d not inserted. Id already exists. Please try again with an unique id.", id);
 		}
 	}
 }
