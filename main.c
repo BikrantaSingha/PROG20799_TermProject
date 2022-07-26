@@ -2,9 +2,9 @@
 main.c
 authors: Bikranta Singha, Harshitbhai Patel, Thinh Quach
 date created: 20th July, 2022
-last modified: 23rd July, 2022
+last modified: 26th July, 2022
 main.c file for group 8's term project for PROG20799 class 91692
-house listings from mls being used to implement 3 different data structures:
+house listings being implemented with 3 different data structures:
 stack, queue, and binary tree
 */
 
@@ -13,23 +13,24 @@ stack, queue, and binary tree
 #include <stdlib.h>
 #include <string.h>
 
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
-
+//node structure for queue and stack
 struct Node {
-	int id; 
+	int id;
 	char address[50];
 	int price;
 	struct Node * nextPtr;
 };
 
+//treenode structure for trees
 struct TreeNode {
 	struct TreeNode * leftPtr;
-	int id;
+	int id; //id will be used as the primary key for comparisions, searches, removals
 	char address[50];
 	int price;
 	struct TreeNode * rightPtr;
 };
 
+//typedefinitions for structs
 typedef struct Node Node;
 typedef Node * NodePtr;
 typedef struct TreeNode TreeNode;
@@ -50,7 +51,8 @@ void printQ(NodePtr queue);
 
 //tree definitions
 void insertIntoTree(TreeNodePtr * tree, int id, char * address, int price);
-void removeFromTree(TreeNodePtr * tree, int id);
+int removeFromTree(TreeNodePtr * treePtr, int id);
+void searchNode(TreeNodePtr *treePtr, int id, TreeNodePtr *parentPtr, TreeNodePtr *tempNodePtr, int *found);
 TreeNodePtr binarySearchById(TreeNodePtr tree, int id);
 void preOrder(TreeNodePtr tree);
 void postOrder(TreeNodePtr tree);
@@ -58,15 +60,20 @@ void inOrder(TreeNodePtr tree);
 
 
 void main(int argc, char *argv[]) {
-	//node attributes
+	//listing attributes
 	int id;
 	int price;
 	char address[50];
-	int i; //will be used for for loops
+	int i; //will be used by for loops
 	
-	//only to be used by queue operations
+	//front and back for queue operations
 	NodePtr front = NULL;
 	NodePtr back = NULL;
+	
+	//search and delete ids for trees
+	int searchID;
+	int removeID;
+	int removedTree;
 	
 	//dummy addresses
 	char * dummyAddresses[] = {
@@ -75,83 +82,24 @@ void main(int argc, char *argv[]) {
 	"701 Cc Circle Road, Mississauga",
 	"9903 Dd Drive, Kitchner",
 	"206 Ee Drive, Toronto",
-	"206 Ee Drive, Toronto"};
+	"9098 Ee Drive, Toronto"};
 	
 	//initializing root for queue and stack
 	NodePtr root = (NodePtr)malloc(sizeof(Node));
 	strcpy(root -> address, "1 34 Aa drive, Toronto");
-	root -> id = 0;
+	root -> id = 53;
 	root -> price = 300000;
 	root -> nextPtr = NULL;
 	
 	//initializing tree 
 	TreeNodePtr tree = (TreeNodePtr)malloc(sizeof(TreeNode));
 	strcpy(tree -> address, "1 34 Aa Avenue, Toronto");
-	tree -> id = 0;
+	tree -> id = 19;
 	tree -> price = 300000;
 	tree -> leftPtr = NULL;
 	tree -> rightPtr = NULL;
 	
 	
-	/*
-	//testing stack operations
-	top(root);
-	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
-	top(root);
-	pop(&root);
-	top(root);
-	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
-	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
-	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
-	push(&root, 2, "2 45 Bb drive, Mississauga", 45);
-	printStack(root);
-	*/
-	/*
-	//testing queue operations
-	front = root;
-	back = root;
-	frontQ(front);
-	backQ(front, back);
-	back = enqueue(&front, back, 3, "3 56 Cc circle, Brampton", 567);
-	frontQ(front);
-	backQ(front, back);
-	printf("\ndq");
-	front = dequeue(&front);
-	printf("\ndq success");
-	frontQ(front);
-	backQ(front,back);
-	back = enqueue(&front, back, 3, "5 56 Cc circle, Brampton", 567);
-	back = enqueue(&front, back, 3, "4 56 Cc circle, Brampton", 567);
-	back = enqueue(&front, back, 3, "2 56 Cc circle, Brampton", 567);
-	printQ(front);
-	*/
-	
-	
-	/*
-	//testing tree operations
-	
-	insertIntoTree(&tree, 16, "2 22 Bb Boulevard, Kitchner", 444);
-	insertIntoTree(&tree, 32, "3 333 Bb Boulevard, Kitchner", 444);
-	insertIntoTree(&tree, 4, "2 555 Bb Boulevard, Kitchner", 444);
-	insertIntoTree(&tree, 5, "2 115 Bb Boulevard, Kitchner", 444);
-	insertIntoTree(&tree, 32, "2 66 Bb Boulevard, Kitchner", 444);
-	
-	printf("\nbinary search for id 777");
-	TreeNodePtr searchTree = binarySearchById(tree, 777);
-	printf("\n %d", searchTree);
-	printf("\nbinary search for id 4");
-	searchTree = binarySearchById(tree, 4);
-	printf("\nid: %d \naddress: %s \nprice: %d",searchTree->id, searchTree->address, searchTree->price);
-		
-	printf("\n inorder:");
-	inOrder(tree);
-	
-	printf("\n preorder:");
-	preOrder(tree);
-	
-	printf("\n postorder:");
-	postOrder(tree);
-	*/
 	//Main menu with submenus
 	int mainChoice;
 	do {
@@ -288,12 +236,19 @@ void main(int argc, char *argv[]) {
 							break;
 
 						case 2: //Remove from Tree
+							printf("\nEnter ID to remove: ");
+							scanf("%d", &removeID);
+							removedTree = removeFromTree(&tree, removeID);
+							if(removedTree == 0){
+								printf("\nListing was not removed. No listing found with id: %d", removeID);
+							} else {
+								printf("\nRemoved listing with id: %d", removeID);
+							}
 
 							break;
 
 						case 3: //Search Data in Tree
 							printf("\nEnter ID to search: ");
-							int searchID;
 							scanf("%d", &searchID);
 							TreeNodePtr searchTree = binarySearchById(tree, searchID);
 							if(searchTree == NULL){
@@ -475,9 +430,113 @@ void insertIntoTree(TreeNodePtr * tree, int id, char * address, int price){
 		} else if(id > (*tree)->id){
 			insertIntoTree(&((*tree)->rightPtr), id, address, price);
 		} else {
-			printf("\nListing with id %d not inserted. Id already exists. Please try again with an unique id.", id);
+			printf("\nListing with id %d not inserted. ID already exists. Please try again with an unique id.", id);
 		}
 	}
+}
+
+//return 0 if no node found or removed
+//return 1 if node successfully removed
+int removeFromTree(TreeNodePtr * treePtr, int id){
+	int found;
+	TreeNodePtr parentPtr, tempNodePtr, replacementNodePtr;
+	
+	if(*treePtr == NULL){
+		return 0;
+	}
+	
+	parentPtr = NULL;
+	tempNodePtr = NULL;
+	replacementNodePtr = NULL;
+	
+	searchNode(treePtr, id, &parentPtr, &tempNodePtr, &found);
+	
+	if(found == 0){
+		return 0;
+	}
+	
+	//two children node
+	if ( tempNodePtr -> leftPtr != NULL && tempNodePtr -> rightPtr != NULL ){
+        parentPtr = tempNodePtr ;
+        replacementNodePtr = tempNodePtr -> rightPtr ;
+
+        while ( replacementNodePtr -> leftPtr != NULL )
+        {
+            parentPtr = replacementNodePtr ;
+            replacementNodePtr = replacementNodePtr -> leftPtr ;
+        }
+
+        tempNodePtr -> id = replacementNodePtr -> id;
+        strcpy(tempNodePtr -> address, replacementNodePtr -> address);
+        tempNodePtr -> price = replacementNodePtr -> price;
+        if(parentPtr->rightPtr = replacementNodePtr){
+        	parentPtr->rightPtr = NULL;
+		}else{
+			parentPtr->leftPtr = NULL;
+		}
+        free(replacementNodePtr);
+        return 1;
+    }
+    
+    //no child
+    if ( tempNodePtr -> leftPtr == NULL && tempNodePtr -> rightPtr == NULL ){
+        if ( parentPtr -> rightPtr == tempNodePtr )
+            parentPtr -> rightPtr = NULL ;
+        else
+            parentPtr -> leftPtr = NULL ;
+
+        free ( tempNodePtr ) ;
+        return 1;
+    }
+    
+    //only right child
+    if ( tempNodePtr -> leftPtr == NULL && tempNodePtr -> rightPtr != NULL ){
+        if ( parentPtr -> leftPtr == tempNodePtr )
+            parentPtr -> leftPtr = tempNodePtr -> rightPtr ;
+        else
+            parentPtr -> rightPtr = tempNodePtr -> rightPtr ;
+
+        free ( tempNodePtr ) ;
+        return 1;
+    }
+    
+    //only left child
+    if ( tempNodePtr -> leftPtr != NULL && tempNodePtr -> rightPtr == NULL ){
+        if ( parentPtr -> leftPtr == tempNodePtr )
+            parentPtr -> leftPtr = tempNodePtr -> leftPtr ;
+        else
+            parentPtr -> rightPtr = tempNodePtr -> leftPtr ;
+
+        free ( tempNodePtr ) ;
+        return 1;
+    }
+    
+	return 0;
+	
+}
+
+void searchNode(TreeNodePtr *treePtr, int id, TreeNodePtr *parentPtr, TreeNodePtr *tempNodePtr, int *found){
+	TreeNodePtr tempPtr ;
+    tempPtr = *treePtr ;
+    *found = 0;
+    *parentPtr = NULL ;
+
+    while ( tempPtr != NULL )
+    {
+     if ( tempPtr -> id == id )
+     {
+       *found = 1;
+       *tempNodePtr = tempPtr ;
+       return ;
+     } else {
+
+       *parentPtr = tempPtr ;
+        if ( tempPtr -> id > id )
+            tempPtr = tempPtr -> leftPtr ;
+        else
+            tempPtr = tempPtr -> rightPtr ;
+    	}
+    }
 }
 
 TreeNodePtr binarySearchById(TreeNodePtr tree, int id){
